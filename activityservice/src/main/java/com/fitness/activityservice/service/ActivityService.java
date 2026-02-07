@@ -16,8 +16,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ActivityService {
     private final ActivityRepository activityRepository;
+    private final UserValidationService userValidationService;
 
     public ActivityRespose trackActivity(AcitivityRequest request) {
+        if(!userValidationService.validateUser(request.getUserId())) {
+            throw  new RuntimeException("User does not exist with user id: " + request.getUserId());
+        }
         Activity activity = Activity.builder()
                 .userId(request.getUserId())
                 .type(request.getType())
