@@ -1,0 +1,29 @@
+spring:
+  data:
+    mongodb:
+      uri: ${MONGODB_URI_AI}
+      database: ${MONGODB_DB_AI}
+    RabbitMQ:
+      host: ${RABBITMQ_HOST}
+      port: ${RABBITMQ_PORT}
+      username: ${RABBITMQ_USERNAME}
+      password: ${RABBITMQ_PASSWORD}
+
+server:
+  port: ${AI_PORT}
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URL}
+
+RabbitMQ:
+  exchange:
+    name: ${RABBITMQ_EXCHANGE_NAME}
+  queue:
+    name: ${RABBITMQ_QUEUE_NAME}
+  routing:
+    key: ${RABBITMQ_ROUTING_KEY}
+Gemini:
+  api:
+    url: ${GEMINI_API_URL}
+    key: ${GEMINI_API_KEY}

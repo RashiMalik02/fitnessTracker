@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: activity-service
+
+  data:
+    mongodb:
+      uri: ${MONGODB_URI_ACTIVITY}
+      database: ${MONGODB_DB_ACTIVITY}
+
+    RabbitMQ:
+      host: ${RABBITMQ_HOST}
+      port: ${RABBITMQ_PORT}
+      username: ${RABBITMQ_USERNAME}
+      password: ${RABBITMQ_PASSWORD}
+
+server:
+  port: ${ACTIVITY_PORT}
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URL}
+
+RabbitMQ:
+  exchange:
+    name: ${RABBITMQ_EXCHANGE_NAME}
+  queue:
+    name: ${RABBITMQ_QUEUE_NAME}
+  routing:
+    key: ${RABBITMQ_ROUTING_KEY}
