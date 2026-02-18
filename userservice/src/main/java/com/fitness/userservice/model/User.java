@@ -23,6 +23,8 @@ public class User {
     private String firstName;
     private String lastName;
 
+    private String keycloakId;
+
     @Enumerated(EnumType.STRING)
     private UserRole role = UserRole.USER;
 
