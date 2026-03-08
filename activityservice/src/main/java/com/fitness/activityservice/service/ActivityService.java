@@ -24,7 +24,7 @@ public class ActivityService {
     @Value("${RabbitMQ.exchange.name}")
     private String exchange;
 
-    @Value("&{RabbitMQ.routing.key}")
+    @Value("${RabbitMQ.routing.key}")
     private String routingKey;
 
     public ActivityRespose trackActivity(AcitivityRequest request) {

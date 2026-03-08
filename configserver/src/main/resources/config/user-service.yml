@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: ${POSTGRESQL_URI}
-    username: ${POSTGRESQL_USERNAME}
-    password: ${POSTGRESQL_PASSWORD}
+    url: jdbc:postgresql://localhost:5432/fitness_tracker_user
+    username: postgres
+    password: RadheRadhe.02
 
   jpa:
     hibernate:
@@ -11,8 +11,8 @@ spring:
     show-sql: true
 
 server:
-  port: ${USER_PORT}
+  port: 8081
 eureka:
   client:
     serviceUrl:
-      defaultZone: ${EUREKA_URL}
+      defaultZone: http://localhost:8671/eureka/

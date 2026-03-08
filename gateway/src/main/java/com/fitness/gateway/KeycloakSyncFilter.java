@@ -21,35 +21,41 @@ public class KeycloakSyncFilter implements WebFilter {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-        String userId = exchange.getRequest().getHeaders().getFirst("X-User-ID");
         String token = exchange.getRequest().getHeaders().getFirst("Authorization");
+        String userId = exchange.getRequest().getHeaders().getFirst("X-User-ID");
         RegisterRequest registerRequest = getUserDetails(token);
 
-        if(userId == null) {
+        if (userId == null && registerRequest != null) {
             userId = registerRequest.getKeycloakId();
         }
-        if(userId != null && token != null) {
-            String finalUserID = userId;
-            return userService.validateUser(finalUserID)
-                    .flatMap(exist -> {
-                        if(!exist) {
-                            //Register user
-                            if(registerRequest != null) {
-                                return  userService.registerUser(registerRequest).then(Mono.empty());
+
+        if (userId != null && token != null) {
+            String finalUserId = userId;
+
+            return userService.validateUser(userId)
+                    .flatMap(exists -> {
+                        if (!exists) {
+                            if (registerRequest != null) {
+                                // ✅ Return the chain INSIDE registerUser's completion
+                                return userService.registerUser(registerRequest)
+                                        .then(Mono.defer(() -> {
+                                            ServerHttpRequest mutated = exchange.getRequest().mutate()
+                                                    .header("X-User-ID", finalUserId).build();
+                                            return chain.filter(exchange.mutate().request(mutated).build());
+                                        }));
                             } else {
-                                return Mono.empty();
+                                // No register request, just pass through
+                                return chain.filter(exchange);
                             }
                         } else {
-                            log.info("User already exists, skipping sync ");
-                            return Mono.empty();
+                            log.info("User already exists, skipping sync");
+                            ServerHttpRequest mutated = exchange.getRequest().mutate()
+                                    .header("X-User-ID", finalUserId).build();
+                            return chain.filter(exchange.mutate().request(mutated).build());
                         }
-                    })
-                    .then (Mono.defer(() -> {
-                        ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
-                                .header("X-User-ID", finalUserID).build();
-                        return chain.filter(exchange.mutate().request(mutatedRequest).build());
-                    }));
+                    });
         }
+
         return chain.filter(exchange);
     }
 
@@ -57,15 +63,14 @@ public class KeycloakSyncFilter implements WebFilter {
         try {
             String tokenWithoutBearer = token.replace("Bearer ", "").trim();
             SignedJWT signedJWT = SignedJWT.parse(tokenWithoutBearer);
-            JWTClaimsSet claimsSet = signedJWT.getJWTClaimsSet();
-
+            JWTClaimsSet claims = signedJWT.getJWTClaimsSet();
             RegisterRequest request = new RegisterRequest();
 
-            request.setEmail(claimsSet.getStringClaim("email"));
-            request.setKeycloakId(claimsSet.getStringClaim("sub"));
+            request.setEmail(claims.getStringClaim("email"));
+            request.setKeycloakId(claims.getStringClaim("sub"));
             request.setPassword("Dummy@123");
-            request.setFirstName(claimsSet.getStringClaim("given_name"));
-            request.setLastName(claimsSet.getStringClaim("family_name"));
+            request.setFirstName(claims.getStringClaim("given_name"));
+            request.setLastName(claims.getStringClaim("family_name"));
             return  request;
         } catch (Exception e) {
             e.printStackTrace();

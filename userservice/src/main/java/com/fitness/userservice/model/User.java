@@ -18,12 +18,12 @@ public class User {
     @Column(unique = true, nullable = false)
     private String email;
 
+    private String keycloakId;
+
     @Column(nullable = false)
     private String password;
     private String firstName;
     private String lastName;
-
-    private String keycloakId;
 
     @Enumerated(EnumType.STRING)
     private UserRole role = UserRole.USER;
