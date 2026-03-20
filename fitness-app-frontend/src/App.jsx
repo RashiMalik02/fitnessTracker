@@ -15,24 +15,21 @@ import LogoutIcon from "@mui/icons-material/Logout"
 const darkTheme = createTheme({
   palette: {
     mode: "dark",
-    primary: { main: "#a78bfa" },
-    secondary: { main: "#34d399" },
-    background: { default: "#0f0f13", paper: "#1a1a24" },
-    text: { primary: "#f1f0ff", secondary: "#9ca3af" },
+    primary: { main: "#94a3b8" },
+    secondary: { main: "#64748b" },
+    background: { default: "#0d0d10", paper: "#13131a" },
+    text: { primary: "#e2e8f0", secondary: "#64748b" },
   },
   shape: { borderRadius: 12 },
-  typography: {
-    fontFamily: "'Inter', sans-serif",
-    h4: { fontWeight: 700 },
-    h6: { fontWeight: 600 },
-  },
+  typography: { fontFamily: "'Inter', sans-serif", h4: { fontWeight: 700 }, h6: { fontWeight: 600 } },
   components: {
     MuiButton: {
       styleOverrides: {
-        root: { textTransform: "none", fontWeight: 600, borderRadius: 10 },
+        root: { textTransform: "none", fontWeight: 600, borderRadius: 10, transition: "all 0.2s ease" },
         containedPrimary: {
-          background: "linear-gradient(135deg, #7c3aed, #a78bfa)",
-          "&:hover": { background: "linear-gradient(135deg, #6d28d9, #8b5cf6)" },
+          background: "#1e293b", border: "1px solid #334155", color: "#e2e8f0",
+          "&:hover": { background: "#273549", borderColor: "#475569", transform: "translateY(-1px)" },
+          "&:active": { transform: "translateY(0px)" },
         },
       },
     },
@@ -40,54 +37,78 @@ const darkTheme = createTheme({
       styleOverrides: {
         root: {
           "& .MuiOutlinedInput-root": {
-            borderRadius: 10,
-            "& fieldset": { borderColor: "#2d2d3d" },
-            "&:hover fieldset": { borderColor: "#7c3aed" },
-            "&.Mui-focused fieldset": { borderColor: "#a78bfa" },
+            borderRadius: 10, transition: "all 0.2s ease",
+            "& fieldset": { borderColor: "#1e293b" },
+            "&:hover fieldset": { borderColor: "#334155" },
+            "&.Mui-focused fieldset": { borderColor: "#475569" },
           },
         },
       },
     },
-    MuiSelect: {
-      styleOverrides: {
-        root: { borderRadius: 10 },
-      },
-    },
     MuiCard: {
       styleOverrides: {
-        root: {
-          background: "#1a1a24",
-          border: "1px solid #2d2d3d",
-          borderRadius: 16,
-        },
+        root: { background: "#13131a", border: "1px solid #1e293b", borderRadius: 16, transition: "all 0.25s ease" },
       },
     },
-    MuiPaper: {
-      styleOverrides: {
-        root: { backgroundImage: "none" },
-      },
-    },
+    MuiPaper: { styleOverrides: { root: { backgroundImage: "none" } } },
   },
 })
 
+const CursorGlow = () => {
+  const [pos, setPos] = useState({ x: -1000, y: -1000 })
+  const [hue, setHue] = useState(210)
+  useEffect(() => {
+    let frame
+    const move = (e) => {
+      cancelAnimationFrame(frame)
+      frame = requestAnimationFrame(() => {
+        setPos({ x: e.clientX, y: e.clientY })
+        setHue(h => (h + 0.3) % 360)
+      })
+    }
+    window.addEventListener("mousemove", move)
+    return () => { window.removeEventListener("mousemove", move); cancelAnimationFrame(frame) }
+  }, [])
+  return (
+    <div style={{
+      position: "fixed", left: pos.x, top: pos.y, width: 350, height: 350,
+      borderRadius: "50%", pointerEvents: "none", zIndex: 0,
+      transform: "translate(-50%, -50%)",
+      background: `radial-gradient(circle, hsla(${hue}, 30%, 60%, 0.08) 0%, transparent 65%)`,
+      transition: "left 0.08s ease, top 0.08s ease",
+    }} />
+  )
+}
+
 const Navbar = ({ tokenData, logOut }) => (
-  <AppBar position="fixed" elevation={0} sx={{ background: "rgba(15,15,19,0.85)", backdropFilter: "blur(12px)", borderBottom: "1px solid #2d2d3d" }}>
+  <AppBar position="fixed" elevation={0} sx={{
+    background: "rgba(13,13,16,0.85)", backdropFilter: "blur(20px)", borderBottom: "1px solid #1e293b"
+  }}>
     <Toolbar sx={{ justifyContent: "space-between" }}>
       <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-        <Box sx={{ background: "linear-gradient(135deg, #7c3aed, #a78bfa)", borderRadius: 2, p: 0.7, display: "flex" }}>
-          <FitnessCenterIcon sx={{ fontSize: 20, color: "#fff" }} />
+        <Box sx={{
+          background: "#1e293b", border: "1px solid #334155", borderRadius: 2,
+          p: 0.7, display: "flex", transition: "all 0.2s ease",
+          "&:hover": { background: "#273549", borderColor: "#475569" }
+        }}>
+          <FitnessCenterIcon sx={{ fontSize: 20, color: "#94a3b8" }} />
         </Box>
-        <Typography variant="h6" sx={{ color: "#f1f0ff", letterSpacing: "-0.3px" }}>
+        <Typography variant="h6" sx={{ color: "#e2e8f0", letterSpacing: "-0.3px", fontWeight: 700 }}>
           FitTracker
         </Typography>
       </Box>
       <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
         <Chip
-          avatar={<Avatar sx={{ bgcolor: "#7c3aed", width: 26, height: 26, fontSize: 12 }}>{tokenData?.given_name?.[0] || "U"}</Avatar>}
+          avatar={<Avatar sx={{ bgcolor: "#1e293b", border: "1px solid #334155", width: 26, height: 26, fontSize: 12, color: "#94a3b8" }}>
+            {tokenData?.given_name?.[0] || "U"}
+          </Avatar>}
           label={tokenData?.given_name || "User"}
-          sx={{ bgcolor: "#1a1a24", border: "1px solid #2d2d3d", color: "#f1f0ff", fontSize: 13 }}
+          sx={{ bgcolor: "#13131a", border: "1px solid #1e293b", color: "#94a3b8", fontSize: 13 }}
         />
-        <IconButton onClick={logOut} sx={{ color: "#9ca3af", "&:hover": { color: "#f87171" } }} size="small">
+        <IconButton onClick={() => logOut()} size="small" sx={{
+          color: "#475569", transition: "all 0.2s ease",
+          "&:hover": { color: "#94a3b8", background: "#1e293b" }
+        }}>
           <LogoutIcon fontSize="small" />
         </IconButton>
       </Box>
@@ -97,34 +118,52 @@ const Navbar = ({ tokenData, logOut }) => (
 
 const LoginPage = ({ logIn }) => (
   <Box sx={{
-    minHeight: "100vh", display: "flex", flexDirection: "column",
-    alignItems: "center", justifyContent: "center", background: "#0f0f13",
-    position: "relative", overflow: "hidden"
+    minHeight: "100vh", display: "flex", alignItems: "center",
+    justifyContent: "center", background: "#0d0d10",
+    position: "relative", overflow: "hidden",
   }}>
+    <style>{`
+      @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+      @keyframes subtlePulse { 0%,100% { opacity: 0.3; } 50% { opacity: 0.5; } }
+      .fade-1 { animation: fadeUp 0.5s ease 0.0s both; }
+      .fade-2 { animation: fadeUp 0.5s ease 0.1s both; }
+      .fade-3 { animation: fadeUp 0.5s ease 0.2s both; }
+      .fade-4 { animation: fadeUp 0.5s ease 0.3s both; }
+      .fade-5 { animation: fadeUp 0.5s ease 0.4s both; }
+    `}</style>
+
+    <CursorGlow />
+
     <Box sx={{
       position: "absolute", width: 600, height: 600, borderRadius: "50%",
-      background: "radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%)",
-      top: "50%", left: "50%", transform: "translate(-50%, -50%)", pointerEvents: "none"
+      background: "radial-gradient(circle, rgba(30,41,59,0.4) 0%, transparent 70%)",
+      top: "50%", left: "50%", transform: "translate(-50%, -50%)",
+      animation: "subtlePulse 8s ease infinite", pointerEvents: "none", zIndex: 0
     }} />
-    <Box sx={{ textAlign: "center", zIndex: 1, maxWidth: 420, px: 3 }}>
-      <Box sx={{
-        background: "linear-gradient(135deg, #7c3aed, #a78bfa)", borderRadius: 3,
-        p: 1.5, display: "inline-flex", mb: 3
+
+    <Box sx={{ textAlign: "center", zIndex: 1, maxWidth: 380, px: 3 }}>
+      <Box className="fade-1" sx={{
+        background: "#1e293b", border: "1px solid #334155",
+        borderRadius: 3, p: 1.5, display: "inline-flex", mb: 3
       }}>
-        <FitnessCenterIcon sx={{ fontSize: 36, color: "#fff" }} />
+        <FitnessCenterIcon sx={{ fontSize: 32, color: "#94a3b8" }} />
       </Box>
-      <Typography variant="h4" sx={{ color: "#f1f0ff", mb: 1.5, letterSpacing: "-0.5px" }}>
-        Welcome to FitTracker
+
+      <Typography className="fade-2" variant="h4" sx={{ color: "#e2e8f0", mb: 1.5, letterSpacing: "-0.5px" }}>
+        FitTracker
       </Typography>
-      <Typography sx={{ color: "#9ca3af", mb: 4, lineHeight: 1.7 }}>
-        Track your workouts and get AI-powered recommendations to crush your fitness goals.
+
+      <Typography className="fade-3" sx={{ color: "#475569", mb: 4, lineHeight: 1.8, fontSize: 15 }}>
+        Track your workouts and get AI-powered recommendations to reach your fitness goals.
       </Typography>
-      <Button variant="contained" size="large" onClick={() => logIn()} fullWidth
-        sx={{ py: 1.5, fontSize: 16, mb: 2 }}>
+
+      <Button className="fade-4" variant="contained" size="large" onClick={() => logIn()} fullWidth
+        sx={{ py: 1.5, fontSize: 15, mb: 2 }}>
         Sign In
       </Button>
-      <Typography sx={{ color: "#6b7280", fontSize: 13 }}>
-        Powered by Keycloak OAuth2 + Google Gemini AI
+
+      <Typography className="fade-5" sx={{ color: "#1e293b", fontSize: 12 }}>
+        Secured with Keycloak OAuth2
       </Typography>
     </Box>
   </Box>
@@ -134,12 +173,15 @@ const ActivitiesPage = () => {
   const [refreshKey, setRefreshKey] = useState(0)
   return (
     <Box sx={{ maxWidth: 900, mx: "auto", px: { xs: 2, md: 4 }, pt: 12, pb: 6 }}>
-      <Typography variant="h4" sx={{ color: "#f1f0ff", mb: 0.5, letterSpacing: "-0.5px" }}>
-        My Activities
-      </Typography>
-      <Typography sx={{ color: "#9ca3af", mb: 4 }}>
-        Log your workouts and get personalized AI insights
-      </Typography>
+      <style>{`@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }`}</style>
+      <Box sx={{ mb: 4, animation: "fadeUp 0.5s ease both" }}>
+        <Typography variant="h4" sx={{ color: "#e2e8f0", mb: 0.5, letterSpacing: "-0.5px" }}>
+          My Activities
+        </Typography>
+        <Typography sx={{ color: "#475569" }}>
+          Log your workouts and get personalized AI insights
+        </Typography>
+      </Box>
       <ActivityForm onActivitiesAdded={() => setRefreshKey(k => k + 1)} />
       <ActivityList key={refreshKey} />
     </Box>

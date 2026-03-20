@@ -12,49 +12,56 @@ import { useNavigate } from "react-router"
 import { getActivitites } from "../services/api"
 
 const activityConfig = {
-  RUNNING: { icon: <DirectionsRunIcon />, color: "#a78bfa", bg: "rgba(167,139,250,0.1)" },
-  WALKING: { icon: <DirectionsWalkIcon />, color: "#34d399", bg: "rgba(52,211,153,0.1)" },
-  CYCLING: { icon: <DirectionsBikeIcon />, color: "#60a5fa", bg: "rgba(96,165,250,0.1)" },
-  CARDIO: { icon: <FitnessCenterIcon />, color: "#f87171", bg: "rgba(248,113,113,0.1)" },
+  RUNNING: { icon: <DirectionsRunIcon sx={{ fontSize: 18 }} />, color: "#94a3b8", bg: "rgba(148,163,184,0.08)" },
+  WALKING: { icon: <DirectionsWalkIcon sx={{ fontSize: 18 }} />, color: "#7dd3a8", bg: "rgba(125,211,168,0.08)" },
+  CYCLING: { icon: <DirectionsBikeIcon sx={{ fontSize: 18 }} />, color: "#7eb8d4", bg: "rgba(126,184,212,0.08)" },
+  CARDIO: { icon: <FitnessCenterIcon sx={{ fontSize: 18 }} />, color: "#b0a0c8", bg: "rgba(176,160,200,0.08)" },
 }
 
-const ActivityCard = ({ activity, onClick }) => {
+const ActivityCard = ({ activity, onClick, index }) => {
   const config = activityConfig[activity.type] || activityConfig.CARDIO
   const date = new Date(activity.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
 
   return (
     <Card onClick={onClick} sx={{
-      cursor: "pointer", transition: "all 0.2s ease",
-      "&:hover": { border: "1px solid #4c4c6d", transform: "translateY(-2px)" },
+      cursor: "pointer",
+      animation: `fadeUp 0.4s ease ${index * 0.06}s both`,
+      "@keyframes fadeUp": { from: { opacity: 0, transform: "translateY(12px)" }, to: { opacity: 1, transform: "translateY(0)" } },
+      "&:hover": {
+        border: "1px solid #334155",
+        transform: "translateY(-3px)",
+        "& .chevron": { transform: "translateX(3px)", color: "#64748b" }
+      },
     }}>
-      <CardContent sx={{ p: 2.5 }}>
+      <CardContent sx={{ p: 2.5, "&:last-child": { pb: 2.5 } }}>
         <Box sx={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", mb: 2 }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-            <Box sx={{ background: config.bg, borderRadius: 2, p: 1, display: "flex", color: config.color }}>
+            <Box sx={{
+              background: config.bg, border: `1px solid ${config.color}22`,
+              borderRadius: 2, p: 0.9, display: "flex", color: config.color
+            }}>
               {config.icon}
             </Box>
             <Box>
-              <Typography variant="h6" sx={{ color: "#f1f0ff", fontSize: 15, lineHeight: 1.2 }}>
+              <Typography sx={{ color: "#e2e8f0", fontSize: 14, fontWeight: 600, lineHeight: 1.2 }}>
                 {activity.type.charAt(0) + activity.type.slice(1).toLowerCase()}
               </Typography>
-              <Typography sx={{ color: "#6b7280", fontSize: 12, mt: 0.3 }}>{date}</Typography>
+              <Typography sx={{ color: "#334155", fontSize: 12, mt: 0.3 }}>{date}</Typography>
             </Box>
           </Box>
-          <ChevronRightIcon sx={{ color: "#4b5563", fontSize: 20, mt: 0.5 }} />
+          <ChevronRightIcon className="chevron" sx={{ color: "#1e293b", fontSize: 18, mt: 0.3, transition: "all 0.2s ease" }} />
         </Box>
 
-        <Box sx={{ display: "flex", gap: 1.5 }}>
+        <Box sx={{ display: "flex", gap: 1 }}>
           <Chip
-            icon={<TimerIcon sx={{ fontSize: "14px !important", color: "#9ca3af !important" }} />}
-            label={`${activity.duration} min`}
-            size="small"
-            sx={{ background: "#12121a", color: "#9ca3af", border: "1px solid #2d2d3d", fontSize: 12 }}
+            icon={<TimerIcon sx={{ fontSize: "13px !important", color: "#475569 !important" }} />}
+            label={`${activity.duration} min`} size="small"
+            sx={{ background: "#0d0d10", color: "#64748b", border: "1px solid #1e293b", fontSize: 11, height: 24 }}
           />
           <Chip
-            icon={<LocalFireDepartmentIcon sx={{ fontSize: "14px !important", color: "#f97316 !important" }} />}
-            label={`${activity.caloriesBurnt} kcal`}
-            size="small"
-            sx={{ background: "#12121a", color: "#9ca3af", border: "1px solid #2d2d3d", fontSize: 12 }}
+            icon={<LocalFireDepartmentIcon sx={{ fontSize: "13px !important", color: "#7d5a3a !important" }} />}
+            label={`${activity.caloriesBurnt} kcal`} size="small"
+            sx={{ background: "#0d0d10", color: "#64748b", border: "1px solid #1e293b", fontSize: 11, height: 24 }}
           />
         </Box>
       </CardContent>
@@ -85,29 +92,30 @@ const ActivityList = () => {
     <Grid container spacing={2}>
       {[1, 2, 3].map(i => (
         <Grid item xs={12} sm={6} md={4} key={i}>
-          <Skeleton variant="rounded" height={130} sx={{ bgcolor: "#1a1a24" }} />
+          <Skeleton variant="rounded" height={120} sx={{ bgcolor: "#13131a", borderRadius: 2 }} />
         </Grid>
       ))}
     </Grid>
   )
 
   if (activities.length === 0) return (
-    <Box sx={{ textAlign: "center", py: 8 }}>
-      <FitnessCenterIcon sx={{ fontSize: 48, color: "#2d2d3d", mb: 2 }} />
-      <Typography sx={{ color: "#6b7280" }}>No activities yet. Log your first workout above!</Typography>
+    <Box sx={{ textAlign: "center", py: 10, border: "1px dashed #1e293b", borderRadius: 3 }}>
+      <FitnessCenterIcon sx={{ fontSize: 40, color: "#1e293b", mb: 2 }} />
+      <Typography sx={{ color: "#334155" }}>No activities yet. Log your first workout above!</Typography>
     </Box>
   )
 
   return (
     <>
-      <Typography variant="h6" sx={{ color: "#f1f0ff", mb: 2 }}>
-        Recent Activities
-        <Chip label={activities.length} size="small" sx={{ ml: 1.5, bgcolor: "rgba(124,58,237,0.2)", color: "#a78bfa", fontSize: 12 }} />
-      </Typography>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2.5 }}>
+        <Typography variant="h6" sx={{ color: "#e2e8f0", fontSize: 15 }}>Recent Activities</Typography>
+        <Chip label={activities.length} size="small"
+          sx={{ bgcolor: "#1e293b", color: "#64748b", border: "1px solid #334155", fontSize: 11, height: 20 }} />
+      </Box>
       <Grid container spacing={2}>
-        {activities.map((activity) => (
+        {activities.map((activity, index) => (
           <Grid item xs={12} sm={6} md={4} key={activity.id}>
-            <ActivityCard activity={activity} onClick={() => navigate(`/activity/${activity.id}`)} />
+            <ActivityCard activity={activity} index={index} onClick={() => navigate(`/activity/${activity.id}`)} />
           </Grid>
         ))}
       </Grid>

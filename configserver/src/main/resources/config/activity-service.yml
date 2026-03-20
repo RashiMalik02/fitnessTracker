@@ -1,17 +1,12 @@
 spring:
   application:
     name: activity-service
-
   data:
     mongodb:
-      uri:
+      uri: ${MONGODB_URI}
       database: fitnessTracker
-
-    RabbitMQ:
-      host: localhost
-      port: 5672
-      username: guest
-      password: guest
+  rabbitmq:
+    addresses: ${RABBITMQ_URL}
 
 server:
   port: 8082
@@ -19,7 +14,7 @@ server:
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:8671/eureka/
+      defaultZone: ${EUREKA_URL:http://localhost:8671/eureka/}
 
 RabbitMQ:
   exchange:

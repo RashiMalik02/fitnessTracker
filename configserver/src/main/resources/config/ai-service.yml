@@ -1,20 +1,20 @@
 spring:
+  application:
+    name: ai-service
   data:
     mongodb:
-      uri:
+      uri: ${MONGODB_URI_AI}
       database: fitnessRecommaendations
-    RabbitMQ:
-      host: localhost
-      port: 5672
-      username: guest
-      password: guest
+  rabbitmq:
+    addresses: ${RABBITMQ_URL}
 
 server:
   port: 8083
+
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:8671/eureka/
+      defaultZone: ${EUREKA_URL:http://localhost:8671/eureka/}
 
 RabbitMQ:
   exchange:
@@ -23,6 +23,7 @@ RabbitMQ:
     name: activity.queue
   routing:
     key: activity.tracking
+
 Gemini:
   api:
     url: ${GEMINI_API_URL}
